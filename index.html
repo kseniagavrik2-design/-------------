@@ -305,6 +305,13 @@
                     );
                 }
             });
+
+            // Накладываем фильтр (прямоугольник с режимом наложения)
+            ctx.save();
+            ctx.globalCompositeOperation = 'soft-light';
+            ctx.fillStyle = 'rgba(115, 70, 70, 1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
         }
 
         // Загрузка изображения блюда
