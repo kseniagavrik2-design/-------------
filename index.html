@@ -292,17 +292,33 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(templateImage, 0, 0);
 
-            // Рисуем выбранные блюда
+            // Рисуем выбранные блюда (с сохранением пропорций)
             ['first', 'second', 'salad'].forEach(type => {
                 if (dishImages[type]) {
                     const pos = DISH_POSITIONS[type];
-                    ctx.drawImage(
-                        dishImages[type],
-                        pos.x,
-                        pos.y,
-                        pos.width,
-                        pos.height
-                    );
+                    const img = dishImages[type];
+                    
+                    // Вычисляем пропорции
+                    const imgRatio = img.width / img.height;
+                    const boxRatio = pos.width / pos.height;
+                    
+                    let drawWidth, drawHeight, drawX, drawY;
+                    
+                    if (imgRatio > boxRatio) {
+                        // Изображение шире области
+                        drawWidth = pos.width;
+                        drawHeight = pos.width / imgRatio;
+                        drawX = pos.x;
+                        drawY = pos.y + (pos.height - drawHeight) / 2; // центрирование по вертикали
+                    } else {
+                        // Изображение уже или такое же
+                        drawHeight = pos.height;
+                        drawWidth = pos.height * imgRatio;
+                        drawX = pos.x + (pos.width - drawWidth) / 2; // центрирование по горизонтали
+                        drawY = pos.y;
+                    }
+                    
+                    ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
                 }
             });
 
