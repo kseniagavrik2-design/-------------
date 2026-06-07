@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍽️ Генератор сезонного меню 2.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🍽️ Генератор сезонного меню 2.2</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -14,11 +14,15 @@
             --bg-gradient-2: #e8dfd0;
         }
 
+        html, body {
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
             color: #333;
         }
 
@@ -27,28 +31,30 @@
             margin: 0 auto;
             background: white;
             border-radius: 20px;
-            padding: 35px;
+            padding: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
 
         h1 {
             text-align: center;
             color: var(--primary-dark);
-            margin-bottom: 30px;
-            font-size: 2.2rem;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            line-height: 1.2;
         }
 
+        /* ===== ВЫБОР СЕЗОНА ===== */
         .season-selector {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
+            gap: 8px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
         }
 
         .season-btn {
-            padding: 12px 28px;
-            font-size: 1rem;
+            padding: 10px 20px;
+            font-size: 0.95rem;
             font-weight: 600;
             border: 2px solid #d9d4c4;
             border-radius: 30px;
@@ -57,7 +63,8 @@
             transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            white-space: nowrap;
         }
 
         .season-btn:hover {
@@ -76,18 +83,19 @@
         .season-btn.winter.active { background: #465A73; border-color: #465A73; }
         .season-btn.autumn.active { background: #A3562D; border-color: #A3562D; }
 
+        /* ===== СЕТКА КОНТРОЛОВ ===== */
         .controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
         .control-group {
             display: flex;
             flex-direction: column;
             background: #fafaf5;
-            padding: 18px;
+            padding: 14px;
             border-radius: 12px;
             border: 1px solid #e8e5dc;
         }
@@ -97,22 +105,31 @@
         .control-group label {
             font-weight: 600;
             color: var(--primary-dark);
-            margin-bottom: 10px;
-            font-size: 1rem;
+            margin-bottom: 8px;
+            font-size: 0.92rem;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
         .control-group select {
-            padding: 11px 14px;
+            padding: 10px 12px;
             border: 2px solid #d9d4c4;
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             cursor: pointer;
             transition: all 0.3s;
             background: white;
             color: #333;
+            width: 100%;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+            padding-right: 35px;
         }
 
         .control-group select:focus {
@@ -122,22 +139,37 @@
         }
 
         .control-group select:disabled {
-            background: #f5f5f5;
+            background-color: #f5f5f5;
             cursor: not-allowed;
             opacity: 0.6;
         }
 
+        /* Каскадные строки (категория + блюдо) — всегда 2 колонки */
         .cascaded-row {
             display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 12px;
+            grid-template-columns: 2fr 3fr;
+            gap: 8px;
         }
 
+        .status-badge {
+            display: inline-block;
+            padding: 3px 9px;
+            background: #f0efe9;
+            color: #777;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            margin-top: 6px;
+            align-self: flex-start;
+        }
+
+        .status-badge.active { background: var(--primary); color: white; }
+
+        /* ===== ПРЕВЬЮ ===== */
         .preview-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .canvas-container {
@@ -148,6 +180,7 @@
             overflow: hidden;
             background: #f9f9f9;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
         }
 
         #mainCanvas {
@@ -156,16 +189,17 @@
             height: auto;
         }
 
+        /* ===== КНОПКИ ===== */
         .buttons {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             flex-wrap: wrap;
             justify-content: center;
         }
 
         .btn {
-            padding: 14px 32px;
-            font-size: 1rem;
+            padding: 12px 28px;
+            font-size: 0.95rem;
             font-weight: 600;
             border: none;
             border-radius: 10px;
@@ -173,7 +207,9 @@
             transition: all 0.3s;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
+            min-width: 140px;
         }
 
         .btn-primary {
@@ -198,26 +234,28 @@
         .info {
             text-align: center;
             color: #888;
-            font-size: 0.9rem;
-            margin-top: 20px;
+            font-size: 0.88rem;
+            margin-top: 15px;
+            line-height: 1.5;
         }
 
+        /* ===== LOADING ===== */
         .loading {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--primary);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .loading-spinner {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border: 4px solid #e8e5dc;
             border-top-color: var(--primary);
             border-radius: 50%;
@@ -226,30 +264,17 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            background: #f0efe9;
-            color: #777;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            margin-top: 8px;
-            text-align: center;
-        }
-
-        .status-badge.active { background: var(--primary); color: white; }
-
-        /* ===== TOAST УВЕДОМЛЕНИЕ ===== */
+        /* ===== TOAST ===== */
         .toast {
             position: fixed;
-            bottom: 30px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: var(--primary-dark);
             color: white;
-            padding: 12px 24px;
+            padding: 12px 22px;
             border-radius: 30px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             opacity: 0;
             transition: all 0.4s;
@@ -268,14 +293,149 @@
         .toast.error { background: #C0392B; }
         .toast.info { background: #3498DB; }
 
-        @media (max-width: 768px) {
-            .container { padding: 20px; }
-            h1 { font-size: 1.6rem; }
-            .controls { grid-template-columns: 1fr; }
+        /* ============================================
+           📱 АДАПТИВ: ПЛАНШЕТЫ И БОЛЬШИЕ ТЕЛЕФОНЫ
+           ============================================ */
+        @media (max-width: 900px) {
+            .container { padding: 25px; }
+            h1 { font-size: 1.8rem; }
+            
             .control-group.span-2 { grid-column: span 1; }
-            .cascaded-row { grid-template-columns: 1fr; }
-            .buttons { flex-direction: column; }
-            .btn { width: 100%; justify-content: center; }
+        }
+
+        /* ============================================
+           📱 АДАПТИВ: ТЕЛЕФОНЫ (до 768px)
+           ============================================ */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            
+            .container {
+                padding: 18px;
+                border-radius: 15px;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                margin-bottom: 18px;
+            }
+
+            .season-selector {
+                gap: 6px;
+                margin-bottom: 18px;
+            }
+
+            .season-btn {
+                padding: 8px 14px;
+                font-size: 0.85rem;
+                border-width: 1.5px;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                margin-bottom: 18px;
+            }
+
+            .control-group {
+                padding: 12px;
+            }
+
+            .control-group label {
+                font-size: 0.88rem;
+                margin-bottom: 6px;
+            }
+
+            .control-group select {
+                padding: 9px 32px 9px 10px;
+                font-size: 0.88rem;
+            }
+
+            /* Каскадные строки остаются в 2 колонки, но пропорционально */
+            .cascaded-row {
+                grid-template-columns: 2fr 3fr;
+                gap: 6px;
+            }
+
+            .cascaded-row select {
+                font-size: 0.82rem;
+                padding: 8px 28px 8px 8px;
+            }
+
+            .status-badge {
+                font-size: 0.7rem;
+                padding: 2px 8px;
+                margin-top: 5px;
+            }
+
+            .canvas-container {
+                border-width: 2px;
+                width: 100%;
+            }
+
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 12px 20px;
+                font-size: 0.92rem;
+                min-width: 0;
+            }
+
+            .info {
+                font-size: 0.82rem;
+            }
+
+            .toast {
+                bottom: 15px;
+                padding: 10px 18px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* ============================================
+           📱 АДАПТИВ: МАЛЕНЬКИЕ ТЕЛЕФОНЫ (iPhone SE и т.п.)
+           ============================================ */
+        @media (max-width: 400px) {
+            body { padding: 8px; }
+            
+            .container { padding: 14px; }
+            
+            h1 {
+                font-size: 1.2rem;
+                margin-bottom: 14px;
+            }
+
+            .season-btn {
+                padding: 7px 11px;
+                font-size: 0.78rem;
+                gap: 4px;
+            }
+
+            .control-group {
+                padding: 10px;
+            }
+
+            .control-group label {
+                font-size: 0.82rem;
+            }
+
+            .control-group select {
+                font-size: 0.82rem;
+                padding: 8px 28px 8px 9px;
+            }
+
+            .cascaded-row select {
+                font-size: 0.78rem;
+                padding: 7px 24px 7px 7px;
+            }
+
+            .btn {
+                font-size: 0.88rem;
+                padding: 11px 16px;
+            }
         }
     </style>
 </head>
@@ -376,7 +536,6 @@
         <p class="info">На телефоне меню сохранится прямо в галерею. На компьютере — скачается файлом.</p>
     </div>
 
-    <!-- TOAST УВЕДОМЛЕНИЕ -->
     <div class="toast" id="toast"></div>
 
     <script>
@@ -468,7 +627,7 @@
         const recoloredCache = {};
 
         // ============================================
-        // 📲 TOAST УВЕДОМЛЕНИЯ
+        // TOAST
         // ============================================
 
         function showToast(message, type = 'info', duration = 3000) {
@@ -479,17 +638,13 @@
             }, duration);
         }
 
-        // ============================================
-        // 📲 ОПРЕДЕЛЕНИЕ МОБИЛЬНОГО УСТРОЙСТВА
-        // ============================================
-
         function isMobileDevice() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
                 || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
         }
 
         // ============================================
-        // 🎨 ПЕРЕКРАСКА КРУЖКОВ
+        // ПЕРЕКРАСКА
         // ============================================
         
         function recolorCircle(img, targetColorHex) {
@@ -596,7 +751,7 @@
         }
 
         // ============================================
-        // 🎨 ОТРИСОВКА
+        // ОТРИСОВКА
         // ============================================
 
         function drawCanvas(applyFilter = true) {
@@ -656,7 +811,7 @@
         }
 
         // ============================================
-        // ЗАГРУЗКА СПИСКОВ ФАЙЛОВ
+        // ЗАГРУЗКА ФАЙЛОВ
         // ============================================
 
         async function getDishFiles(type) {
@@ -731,7 +886,7 @@
         }
 
         // ============================================
-        // ОБРАБОТЧИКИ: СМЕНА СЕЗОНА
+        // СМЕНА СЕЗОНА
         // ============================================
 
         document.querySelectorAll('.season-btn').forEach(btn => {
@@ -756,7 +911,7 @@
         });
 
         // ============================================
-        // ОБРАБОТЧИКИ КАТЕГОРИЙ
+        // КАТЕГОРИИ
         // ============================================
 
         document.getElementById('secondCategorySelect').addEventListener('change', async (e) => {
@@ -818,7 +973,7 @@
         });
 
         // ============================================
-        // ОБРАБОТЧИКИ ВЫБОРА БЛЮД
+        // ВЫБОР БЛЮД
         // ============================================
 
         document.getElementById('firstSelect').addEventListener('change', async (e) => {
@@ -875,13 +1030,12 @@
         }
 
         // ============================================
-        // 📲 СОХРАНЕНИЕ В ГАЛЕРЕЮ (Web Share API)
+        // ЭКСПОРТ
         // ============================================
 
         async function saveToGallery(blob, filename) {
             const file = new File([blob], filename, { type: 'image/png' });
             
-            // Проверяем, поддерживает ли устройство Web Share API с файлами
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
                     await navigator.share({
@@ -892,7 +1046,6 @@
                     showToast('✅ Меню сохранено!', 'success');
                     return true;
                 } catch (err) {
-                    // Пользователь отменил — не считаем ошибкой
                     if (err.name !== 'AbortError') {
                         console.error('Ошибка Web Share:', err);
                         return false;
@@ -903,7 +1056,6 @@
             return false;
         }
 
-        // Классическое скачивание (для ПК или как fallback)
         function downloadAsFile(blob, filename) {
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -915,43 +1067,33 @@
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
-        // ============================================
-        // 🎯 ГЛАВНАЯ ФУНКЦИЯ ЭКСПОРТА
-        // ============================================
-
         downloadBtn.addEventListener('click', async () => {
             if (!templateImage) return;
 
-            // Финальная отрисовка с фильтром
             drawCanvas(true);
 
             const seasonName = SEASONS[currentSeason].name.toLowerCase();
             const filename = `меню_${seasonName}_${new Date().toISOString().slice(0, 10)}.png`;
 
-            // Показываем индикатор
             downloadBtn.disabled = true;
             const originalText = downloadBtn.innerHTML;
             downloadBtn.innerHTML = '<div class="loading-spinner" style="width:20px;height:20px;border-width:3px;"></div> Подготовка...';
 
             try {
-                // Конвертируем canvas в Blob (современный способ)
                 const blob = await new Promise(resolve => {
                     canvas.toBlob(resolve, 'image/png', 1.0);
                 });
 
                 if (!blob) throw new Error('Не удалось создать изображение');
 
-                // На мобильных устройствах — пробуем сохранение в галерею
                 if (isMobileDevice()) {
                     const shared = await saveToGallery(blob, filename);
                     
                     if (!shared) {
-                        // Fallback: если Web Share не сработал — скачиваем
                         downloadAsFile(blob, filename);
                         showToast('💾 Файл скачан. Переместите его в галерею вручную.', 'info', 5000);
                     }
                 } else {
-                    // На ПК — обычное скачивание
                     downloadAsFile(blob, filename);
                     showToast('✅ Меню скачано!', 'success');
                 }
