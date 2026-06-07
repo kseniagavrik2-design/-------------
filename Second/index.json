@@ -1,0 +1,11 @@
+{
+  "categories": {
+    "grechka":   { "name": "Гречка",   "folder": "Second/Grechka/" },
+    "kapusta":   { "name": "Капуста",  "folder": "Second/Kapusta/" },
+    "kartoshka": { "name": "Картошка", "folder": "Second/Kartoshka/" },
+    "makaroni":  { "name": "Макароны", "folder": "Second/Makaroni/" },
+    "perlovka":  { "name": "Перловка", "folder": "Second/Perlovka/" },
+    "ris":       { "name": "Рис",      "folder": "Second/Ris/" },
+    "ekzotika":  { "name": "Экзотика", "folder": "Second/Ekzotika/" }
+  }
+}

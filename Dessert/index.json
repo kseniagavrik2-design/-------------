@@ -1,0 +1,7 @@
+{
+  "categories": {
+    "chezcake":   { "name": "Чизкейки",   "folder": "Dessert/Chezcake/" },
+    "tart":   { "name": "Тарталетки",  "folder": "Dessert/Tart/" },
+    "tort": { "name": "Торты, мороженное и сырники", "folder": "Dessert/Tort/" }
+  }
+}
